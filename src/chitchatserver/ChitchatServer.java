@@ -210,20 +210,25 @@ public class ChitchatServer extends javax.swing.JFrame {
                     client = dpIn.getAddress();
                     clientPort = dpIn.getPort();
 
+                    if (msgIn.equals("login")) {
+                        addIP(client, clientPort);
+                    } else if (msgIn.equals("logout")) {
+                        deleteIP(client, clientPort);
+                    } else {
+                        sendEveryUser(msgIn);
+
+                        //show in tb *new
+                        model.addRow(new Object[]{client, msgIn});
+                    }
+
                     //check client
 //                    System.out.println("Check User have : " + checkUser(client.toString()));
                     //check id new or old
-                    if (checkUser(client,clientPort)) {
-                        System.out.println("old id");
-                    } else {
-                        System.out.println("new id");
-                    }
-
-                    sendEveryUser();
-
-                    //show in tb *new
-                    model.addRow(new Object[]{client, msgIn});
-
+//                    if (checkUser(client, clientPort)) {
+//                        System.out.println("old id");
+//                    } else {
+//                        System.out.println("new id");
+//                    }
                 }
 
             } catch (SocketException se) {
@@ -236,6 +241,28 @@ public class ChitchatServer extends javax.swing.JFrame {
                 //step 8 close
                 ds.close();
 
+            }
+        }
+
+        public void addIP(InetAddress username, int ports) {
+            //userip.add(username);
+            //portArray.add(ports);
+
+            System.out.println("useradd : " + userip.add(username));
+            System.out.println("portadd : " + portArray.add(ports));
+
+            System.out.println("useradd 2 : " + username);
+            System.out.println("portadd 2 : " + ports);
+        }
+
+        public void deleteIP(InetAddress username, int ports) {
+
+            int usersize = userip.size();
+            for (int i = 0; i < usersize; i++) {
+                if (portArray.get(i).equals(ports)) {
+                    userip.remove(i);
+                    portArray.remove(i);
+                }
             }
         }
 
@@ -257,7 +284,8 @@ public class ChitchatServer extends javax.swing.JFrame {
 
         }
 
-        public boolean checkUser(InetAddress username,int ports) {
+        /*
+        public boolean checkUser(InetAddress username, int ports) {
             int usersize = userip.size();
             for (int i = 0; i < usersize; i++) {
                 if (userip.get(i).equals(username)) {
@@ -269,27 +297,26 @@ public class ChitchatServer extends javax.swing.JFrame {
             portArray.add(ports);
             return false;
         }
-
-        public void sendEveryUser() {
+         */
+        public void sendEveryUser(String msg) {
             int usersize = userip.size();
 
-//            msgOut = msgIn;
-//            dpOut = new DatagramPacket(msgOut.getBytes(), msgOut.length(), client, clientPort);
-//
-//            //step 7 sent packet
-//            ds.send(dpOut);
-            msgOut = msgIn;
+            msgOut = msg;
             for (int i = 0; i < usersize; i++) {
 //InetAddress
                 try {
+
+                    System.out.println("userip " + i + " : " + userip.get(i));
+                    System.out.println("port " + i + " : " + portArray.get(i));
+
                     InetAddress clientSend = userip.get(i);
                     int clientPortSend = portArray.get(i);
-                    
+
                     dpOut = new DatagramPacket(msgOut.getBytes(), msgOut.length(), clientSend, clientPortSend);
 
                     //step 7 sent packet
                     ds.send(dpOut);
-                    System.out.println("Send in for (sendEveryUser) : "+i+" : "+clientSend+"\n port : "+clientPortSend);
+                    System.out.println("Send in for (sendEveryUser) : " + i + " : " + clientSend + "\n port : " + clientPortSend);
 
                 } catch (IOException ioe) {
                     System.out.println("IO error : " + ioe);
