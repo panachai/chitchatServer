@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
@@ -12,7 +13,6 @@ import javax.swing.table.DefaultTableModel;
 public class ChitchatServer extends javax.swing.JFrame {
 
     private DefaultTableModel model;
-
     private Server server;
 
     private DatagramSocket ds;
@@ -22,11 +22,17 @@ public class ChitchatServer extends javax.swing.JFrame {
     int clientPort;
     private String msgIn, msgOut;
 
+    private ArrayList<InetAddress> userip; //IP นะ
+    private ArrayList<Integer> portArray;
+
     public ChitchatServer() {
         initComponents();
 
         server = new Server();
         model = (DefaultTableModel) tbUser.getModel();
+
+        userip = new ArrayList();
+        portArray = new ArrayList();
 
     }
 
@@ -46,6 +52,8 @@ public class ChitchatServer extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setText("PORT : ");
+
+        tfPort.setText("8888");
 
         btStart.setText("START");
         btStart.addActionListener(new java.awt.event.ActionListener() {
@@ -184,21 +192,9 @@ public class ChitchatServer extends javax.swing.JFrame {
 
     class Server extends Thread {
 
-        public Server() {
-
-        }
-
         public void run() {
             try {
-                //step 1 open port
-                ds = new DatagramSocket(8888);
-
-                //step 2 create buffer
-                buffer = new byte[256];
-
-                //setp 3 create datagram packet (เพื่อรับข้อมูล)
-                dpIn = new DatagramPacket(buffer, buffer.length);
-                lbStatus.setText("Running..");
+                create();
 
                 while (true) {
                     sleep(1);
@@ -209,21 +205,24 @@ public class ChitchatServer extends javax.swing.JFrame {
                     //step 5 extract message (แปลง byte เป็น String)
                     msgIn = new String(dpIn.getData(), 0, dpIn.getLength());
                     System.out.println("from client " + msgIn);
-                    
-
 
                     //step 6 prepair packet for client
                     client = dpIn.getAddress();
                     clientPort = dpIn.getPort();
-                    msgOut = msgIn;
-                    dpOut = new DatagramPacket(msgOut.getBytes(), msgOut.length(), client, clientPort);
-                    
-                    //show in tb *new
-                    model.addRow(new Object[]{client,msgIn});
-                    
 
-                    //step 7 sent packet
-                    ds.send(dpOut);
+                    //check client
+//                    System.out.println("Check User have : " + checkUser(client.toString()));
+                    //check id new or old
+                    if (checkUser(client,clientPort)) {
+                        System.out.println("old id");
+                    } else {
+                        System.out.println("new id");
+                    }
+
+                    sendEveryUser();
+
+                    //show in tb *new
+                    model.addRow(new Object[]{client, msgIn});
 
                 }
 
@@ -236,6 +235,65 @@ public class ChitchatServer extends javax.swing.JFrame {
                 System.out.println("Interrupted");
                 //step 8 close
                 ds.close();
+
+            }
+        }
+
+        public void create() {
+            try {  //step 1 open port
+                ds = new DatagramSocket(8888);
+
+                //step 2 create buffer
+                buffer = new byte[256];
+
+                //setp 3 create datagram packet (เพื่อรับข้อมูล)
+                dpIn = new DatagramPacket(buffer, buffer.length);
+                lbStatus.setText("Running..");
+
+            } catch (SocketException se) {
+                System.out.println("Socket Error : " + se);
+                System.exit(-1);
+            }
+
+        }
+
+        public boolean checkUser(InetAddress username,int ports) {
+            int usersize = userip.size();
+            for (int i = 0; i < usersize; i++) {
+                if (userip.get(i).equals(username)) {
+                    return true;
+                }
+            }
+            //ในกรณี Username ไม่มีใน Array ให้ add เข้า
+            userip.add(username);
+            portArray.add(ports);
+            return false;
+        }
+
+        public void sendEveryUser() {
+            int usersize = userip.size();
+
+//            msgOut = msgIn;
+//            dpOut = new DatagramPacket(msgOut.getBytes(), msgOut.length(), client, clientPort);
+//
+//            //step 7 sent packet
+//            ds.send(dpOut);
+            msgOut = msgIn;
+            for (int i = 0; i < usersize; i++) {
+//InetAddress
+                try {
+                    InetAddress clientSend = userip.get(i);
+                    int clientPortSend = portArray.get(i);
+                    
+                    dpOut = new DatagramPacket(msgOut.getBytes(), msgOut.length(), clientSend, clientPortSend);
+
+                    //step 7 sent packet
+                    ds.send(dpOut);
+                    System.out.println("Send in for (sendEveryUser) : "+i+" : "+clientSend+"\n port : "+clientPortSend);
+
+                } catch (IOException ioe) {
+                    System.out.println("IO error : " + ioe);
+                }
 
             }
         }
