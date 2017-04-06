@@ -34,6 +34,12 @@ public class ChitchatServer extends javax.swing.JFrame {
         userip = new ArrayList();
         portArray = new ArrayList();
 
+        btStop.setEnabled(false);
+        btClear.setEnabled(false);
+
+        //show table status
+        tbUser.setEnabled(false);
+
     }
 
     @SuppressWarnings("unchecked")
@@ -137,10 +143,30 @@ public class ChitchatServer extends javax.swing.JFrame {
 
     private void btStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStartActionPerformed
         server.start();
+
+        tfPort.setEnabled(false);
+
+        btStart.setEnabled(false);
+        btStop.setEnabled(true);
+
+        btClear.setEnabled(true);
+
+        //show table status
+        tbUser.setEnabled(true);
     }//GEN-LAST:event_btStartActionPerformed
 
     private void btStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStopActionPerformed
         server.interrupt();
+        tfPort.setEnabled(true);
+
+        btStart.setEnabled(true);
+        btStop.setEnabled(false);
+
+        btClear.setEnabled(false);
+
+        //show table status
+        tbUser.setEnabled(false);
+
     }//GEN-LAST:event_btStopActionPerformed
 
     private void btClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btClearActionPerformed
