@@ -157,6 +157,7 @@ public class ChitchatServer extends javax.swing.JFrame {
 
     private void btStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStopActionPerformed
         server.interrupt();
+
         tfPort.setEnabled(true);
 
         btStart.setEnabled(true);
@@ -166,6 +167,8 @@ public class ChitchatServer extends javax.swing.JFrame {
 
         //show table status
         tbUser.setEnabled(false);
+
+        lbStatus.setText("Stop");
 
     }//GEN-LAST:event_btStopActionPerformed
 
@@ -279,10 +282,9 @@ public class ChitchatServer extends javax.swing.JFrame {
 
             System.out.println("useradd 2 : " + username);
             System.out.println("portadd 2 : " + ports);
-            
-            model.addRow(new Object[]{username , "Connecting.. Complete"});
-            
-            
+
+            model.addRow(new Object[]{username, "Connecting.. Complete"});
+
         }
 
         public void deleteIP(InetAddress username, int ports) {
@@ -290,7 +292,7 @@ public class ChitchatServer extends javax.swing.JFrame {
             int usersize = userip.size();
             for (int i = 0; i < usersize; i++) {
                 if (portArray.get(i).equals(ports)) {
-                    model.addRow(new Object[]{userip.get(i) , "Disconnect"});
+                    model.addRow(new Object[]{userip.get(i), "Disconnect"});
                     userip.remove(i);
                     portArray.remove(i);
                 }
@@ -315,20 +317,6 @@ public class ChitchatServer extends javax.swing.JFrame {
 
         }
 
-        /*
-        public boolean checkUser(InetAddress username, int ports) {
-            int usersize = userip.size();
-            for (int i = 0; i < usersize; i++) {
-                if (userip.get(i).equals(username)) {
-                    return true;
-                }
-            }
-            //ในกรณี Username ไม่มีใน Array ให้ add เข้า
-            userip.add(username);
-            portArray.add(ports);
-            return false;
-        }
-         */
         public void sendEveryUser(String msg) {
             int usersize = userip.size();
 
@@ -356,5 +344,19 @@ public class ChitchatServer extends javax.swing.JFrame {
             }
         }
 
+        /*
+        public boolean checkUser(InetAddress username, int ports) {
+            int usersize = userip.size();
+            for (int i = 0; i < usersize; i++) {
+                if (userip.get(i).equals(username)) {
+                    return true;
+                }
+            }
+            //ในกรณี Username ไม่มีใน Array ให้ add เข้า
+            userip.add(username);
+            portArray.add(ports);
+            return false;
+        }
+         */
     }
 }
