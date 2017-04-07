@@ -82,7 +82,7 @@ public class ChitchatServer extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Status"
+                "IP", "Status"
             }
         ));
         jScrollPane1.setViewportView(tbUser);
@@ -274,11 +274,15 @@ public class ChitchatServer extends javax.swing.JFrame {
             //userip.add(username);
             //portArray.add(ports);
 
-            System.out.println("useradd : " + userip.add(username));
-            System.out.println("portadd : " + portArray.add(ports));
+            userip.add(username);
+            portArray.add(ports);
 
             System.out.println("useradd 2 : " + username);
             System.out.println("portadd 2 : " + ports);
+            
+            model.addRow(new Object[]{username , "Connecting.. Complete"});
+            
+            
         }
 
         public void deleteIP(InetAddress username, int ports) {
@@ -286,6 +290,7 @@ public class ChitchatServer extends javax.swing.JFrame {
             int usersize = userip.size();
             for (int i = 0; i < usersize; i++) {
                 if (portArray.get(i).equals(ports)) {
+                    model.addRow(new Object[]{userip.get(i) , "Disconnect"});
                     userip.remove(i);
                     portArray.remove(i);
                 }
