@@ -12,27 +12,15 @@ import javax.swing.table.DefaultTableModel;
 
 public class ChitchatServer extends javax.swing.JFrame {
 
-    private DefaultTableModel model;
     private Server server;
 
-    private DatagramSocket ds;
-    private DatagramPacket dpIn, dpOut;
-    private byte[] buffer;
-    private InetAddress client;
-    int clientPort;
-    private String msgIn, msgOut;
-
-    private ArrayList<InetAddress> userip; //IP นะ
-    private ArrayList<Integer> portArray;
+    private DefaultTableModel model;
 
     public ChitchatServer() {
         initComponents();
-
         server = new Server();
-        model = (DefaultTableModel) tbUser.getModel();
 
-        userip = new ArrayList();
-        portArray = new ArrayList();
+        model = (DefaultTableModel) tbUser.getModel();
 
         btStop.setEnabled(false);
         btClear.setEnabled(false);
@@ -142,6 +130,7 @@ public class ChitchatServer extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStartActionPerformed
+
         server.start();
 
         tfPort.setEnabled(false);
@@ -157,7 +146,7 @@ public class ChitchatServer extends javax.swing.JFrame {
 
     private void btStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btStopActionPerformed
         server.interrupt();
-
+        
         tfPort.setEnabled(true);
 
         btStart.setEnabled(true);
@@ -221,11 +210,30 @@ public class ChitchatServer extends javax.swing.JFrame {
 
     class Server extends Thread {
 
+        private DatagramSocket ds;
+        private DatagramPacket dpIn, dpOut;
+        private byte[] buffer;
+        private InetAddress client;
+        int clientPort;
+        private String msgIn, msgOut;
+
+        private ArrayList<InetAddress> userip; //IP นะ
+        private ArrayList<Integer> portArray;
+
+        private boolean loop;
+
+        public Server() {
+            userip = new ArrayList();
+            portArray = new ArrayList();
+
+            loop = true;
+        }
+
         public void run() {
             try {
                 create();
 
-                while (true) {
+                while (loop) {
                     sleep(1);
 
                     //step 4 receive packet
@@ -269,7 +277,9 @@ public class ChitchatServer extends javax.swing.JFrame {
                 System.out.println("Interrupted");
                 //step 8 close
                 ds.close();
-
+                loop = false;
+                
+                //System.exit(0);
             }
         }
 
